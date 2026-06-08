@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: ${AUTH_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/auth/**
+        - id: user-service
+          uri: ${USER_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/users/**
+        - id: payment-method-service
+          uri: ${PAYMENT_METHOD_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/payment-methods/**
+        - id: payment-orchestrator
+          uri: ${PAYMENT_ORCHESTRATOR_URL:http://localhost:8084}
+          predicates:
+            - Path=/api/payments/**
+        - id: ledger-service
+          uri: ${LEDGER_SERVICE_URL:http://localhost:8085}
+          predicates:
+            - Path=/api/ledger/**
+server:
+  port: 8080
+jwt:
+  secret: ${JWT_SECRET:my-256-bit-secret-key}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus

@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: payment-orchestrator
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+  data:
+    redis:
+       host: ${REDIS_HOST}
+       port: 6379
+       password: ${REDIS_PASSWORD}
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: 5672
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+server:
+  port: 8084
+payment:
+  limits:
+    daily-max-amount: 100000.00
+    max-payments-per-minute: 5
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+sentry:
+  dsn: ${SENTRY_DSN:}
+  environment: ${SENTRY_ENVIRONMENT:production}
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
