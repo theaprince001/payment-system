@@ -17,7 +17,6 @@ FROM eclipse-temurin:17-jre-alpine
 
 # Copy JARs from build stage
 COPY --from=build /workspace/auth-service/target/*.jar /app/auth-service.jar
-COPY --from=build /workspace/api-gateway/target/*.jar /app/api-gateway.jar
 COPY --from=build /workspace/payment-orchestrator/target/*.jar /app/payment-orchestrator.jar
 COPY --from=build /workspace/ledger-service/target/*.jar /app/ledger-service.jar
 

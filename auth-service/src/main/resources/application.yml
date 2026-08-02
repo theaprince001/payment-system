@@ -1,6 +1,6 @@
 spring:
   application:
-    name: auth-service
+    name: auth-gateway
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/payment_db}
     username: ${DB_USER}
@@ -9,24 +9,43 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: false
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: 6379
-      password: ${REDIS_PASSWORD}
+  redis:
+    spring. data. redis. host: ${REDIS_HOST:localhost}
+    spring. data. redis. port: 6379
+    spring. data. redis. password: ${REDIS_PASSWORD}
+  cloud:
+    gateway:
+      routes:
+        - id: auth-endpoints
+          uri: http://localhost:${server.port}
+          predicates:
+            - Path=/api/auth/**
+        - id: payment-orchestrator
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/payments/**
+        - id: ledger-service
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/ledger/**
+
 server:
-  port: 8081
+  port: 8080
+
 jwt:
   secret: ${JWT_SECRET:my-256-bit-secret-key}
   expiration-ms: 86400000
+
 management:
   endpoints:
     web:
       exposure:
         include: health,info,prometheus
+
 sentry:
   dsn: ${SENTRY_DSN:}
   environment: ${SENTRY_ENVIRONMENT:production}
+
 springdoc:
   api-docs:
     path: /api-docs
