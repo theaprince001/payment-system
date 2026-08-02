@@ -16,6 +16,9 @@ RUN mvn clean package -DskipTests -pl common,auth-service,user-service,payment-m
 FROM eclipse-temurin:17-jre-alpine
 RUN apk add --no-cache rabbitmq-server
 
+# Set RabbitMQ memory limit via config file (fixes rabbitmqctl error)
+RUN echo "vm_memory_high_watermark.relative = 0.05" >> /etc/rabbitmq/rabbitmq.conf
+
 # Copy all JARs from build stage
 COPY --from=build /workspace/auth-service/target/*.jar /app/auth-service.jar
 COPY --from=build /workspace/user-service/target/*.jar /app/user-service.jar
