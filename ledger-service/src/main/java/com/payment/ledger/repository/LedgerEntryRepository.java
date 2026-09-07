@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,4 +15,6 @@ import java.util.UUID;
 public interface LedgerEntryRepository extends JpaRepository<LedgerEntry, UUID> {
     @Query("SELECT SUM(l.amount) FROM LedgerEntry l WHERE l.accountId = :accountId")
     Optional<BigDecimal> sumAmountByAccountId(@Param("accountId") UUID accountId);
+    List<LedgerEntry> findByAccountIdOrderByTimestampDesc(UUID accountId);
+
 }

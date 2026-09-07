@@ -35,6 +35,10 @@ out/
 .project
 .factorypath
 bin/
+# Python
+__pycache__/
+*.pyc
+fraud-python-service/fraud_model.joblib
 
 # IDE files – VS Code
 .vscode/

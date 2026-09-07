@@ -35,7 +35,7 @@ public class PaymentIntent {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private PaymentStatus status;
+    private PaymentStatus status;   // uses common enum
 
     private String failureReason;
 
@@ -46,6 +46,14 @@ public class PaymentIntent {
 
     @Version
     private Long version;
+
+    private String riskDecision;     // ALLOW, REVIEW, BLOCK
+    private String riskSource;       // ML, FALLBACK, RULE, ERROR
+    private double riskScore;
+
+    private String reviewedBy;
+    private Instant reviewedAt;
+    private String reviewNote;
 
     @PrePersist
     protected void onCreate() {

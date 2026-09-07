@@ -3,6 +3,17 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:3000"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowedHeaders: "*"
+            allowCredentials: true
       routes:
         - id: auth-service
           uri: ${AUTH_SERVICE_URL:http://localhost:8081}
@@ -24,10 +35,13 @@ spring:
           uri: ${LEDGER_SERVICE_URL:http://localhost:8085}
           predicates:
             - Path=/api/ledger/**
+
 server:
   port: 8080
+
 jwt:
   secret: ${JWT_SECRET:my-256-bit-secret-key}
+
 management:
   endpoints:
     web:

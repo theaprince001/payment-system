@@ -1,5 +1,5 @@
 package com.payment.common.model;
 
 public enum PaymentStatus {
-    CREATED, PENDING, SUCCESS, FAILED, REVERSED
+    CREATED, PENDING, SUCCESS, FAILED, REVERSED,PENDING_REVIEW
 }
