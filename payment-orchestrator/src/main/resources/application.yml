@@ -26,6 +26,8 @@ payment:
   limits:
     daily-max-amount: 100000.00
     max-payments-per-minute: 5
+
+    provider: ${PAYMENT_PROVIDER:mock}
 management:
   endpoints:
     web:

@@ -25,9 +25,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestPropertySource(properties = {
-        "spring.datasource.url=jdbc:postgresql://localhost:5432/payment_db",
-        "spring.datasource.username=payment_user",
-        "spring.datasource.password=StrongDbPass123!"
+        "spring.datasource.url=${DB_URL:jdbc:postgresql://localhost:5432/payment_db}",
+        "spring.datasource.username=${DB_USER}",
+        "spring.datasource.password=${DB_PASSWORD}"
 })
 @Transactional(propagation = Propagation.NOT_SUPPORTED)   // 🔥 disable test transaction
 public class ReviewConditionalUpdateConcurrencyTest {
