@@ -304,6 +304,30 @@ services:
       postgres:
         condition: service_healthy
 
+#  payment-orchestrator:
+#    build: ./payment-orchestrator
+#    container_name: payment-orchestrator
+#    restart: unless-stopped
+#    environment:
+#      SPRING_PROFILES_ACTIVE: prod
+#      DB_URL: jdbc:postgresql://postgres:5432/payment_db
+#      DB_USER: ${DB_USER}
+#      DB_PASSWORD: ${DB_PASSWORD}
+#      REDIS_HOST: redis
+#      REDIS_PASSWORD: ${REDIS_PASSWORD}
+#      RABBITMQ_HOST: rabbitmq
+#      RABBITMQ_USER: ${RABBITMQ_USER}
+#      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+#      SENTRY_DSN: ${SENTRY_DSN:-}
+#      PAYMENT_METHOD_SERVICE_URL: http://payment-method-service:8083
+#      FRAUD_SERVICE_URL: http://fraud-python-service:8000
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#      redis:
+#        condition: service_healthy
+#      rabbitmq:
+#        condition: service_healthy
   payment-orchestrator:
     build: ./payment-orchestrator
     container_name: payment-orchestrator
@@ -321,6 +345,10 @@ services:
       SENTRY_DSN: ${SENTRY_DSN:-}
       PAYMENT_METHOD_SERVICE_URL: http://payment-method-service:8083
       FRAUD_SERVICE_URL: http://fraud-python-service:8000
+      PAYMENT_PROVIDER: ${PAYMENT_PROVIDER}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET}
+      RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET}
     depends_on:
       postgres:
         condition: service_healthy

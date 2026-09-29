@@ -9,6 +9,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -16,6 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class LedgerService {
+
     private final LedgerEntryRepository ledgerEntryRepository;
     private final RabbitTemplate rabbitTemplate;
 
@@ -30,12 +32,20 @@ public class LedgerService {
             }
             LedgerEntry entry = mapToEntity(debitDto);
             ledgerEntryRepository.save(entry);
-            rabbitTemplate.convertAndSend("payment.exchange", "ledger.success", debitDto.getPaymentId());
-        } catch (Exception e) {
-            log.error("Debit failed: {}", e.getMessage());
+            rabbitTemplate.convertAndSend("payment.exchange", "ledger.success",
+                    debitDto.getPaymentId());
+        } catch (InsufficientBalanceException e) {
+            // Business failure — publish the failure, DO NOT rethrow.
+            log.warn("Debit rejected for payment {}: {}",
+                    debitDto.getPaymentId(), e.getMessage());
             rabbitTemplate.convertAndSend("payment.exchange", "ledger.failure",
                     new LedgerFailureEvent(debitDto.getPaymentId(), e.getMessage()));
-            throw e;
+        } catch (Exception e) {
+            // Unexpected failure — log, publish failure, ack. Do not rethrow.
+            log.error("Unexpected error processing debit for payment {}",
+                    debitDto.getPaymentId(), e);
+            rabbitTemplate.convertAndSend("payment.exchange", "ledger.failure",
+                    new LedgerFailureEvent(debitDto.getPaymentId(), "Internal ledger error"));
         }
     }
 
@@ -47,10 +57,10 @@ public class LedgerService {
             LedgerEntry entry = mapToEntity(creditDto);
             ledgerEntryRepository.save(entry);
         } catch (Exception e) {
-            log.error("Credit failed: {}", e.getMessage());
+            log.error("Unexpected error processing credit for payment {}",
+                    creditDto.getPaymentId(), e);
             rabbitTemplate.convertAndSend("payment.exchange", "ledger.failure",
-                    new LedgerFailureEvent(creditDto.getPaymentId(), e.getMessage()));
-            throw e;
+                    new LedgerFailureEvent(creditDto.getPaymentId(), "Internal ledger error"));
         }
     }
 
@@ -68,7 +78,9 @@ public class LedgerService {
     }
 
     public static class InsufficientBalanceException extends RuntimeException {
-        public InsufficientBalanceException(String message) { super(message); }
+        public InsufficientBalanceException(String message) {
+            super(message);
+        }
     }
 
     public record LedgerFailureEvent(UUID paymentId, String reason) {}

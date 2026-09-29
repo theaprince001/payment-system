@@ -143,6 +143,7 @@ public class PaymentOrchestratorService {
         // ============== ALLOW: proceed to provider ==============
         // Only call the provider when we've decided to proceed. This prevents
         // orphaned orders on the provider's side for payments we've blocked.
+        // ============== ALLOW: proceed to provider ==============
         ProviderResponse providerResponse = paymentProvider.initiatePayment(intent);
         if (!providerResponse.success()) {
             intent.setStatus(PaymentStatus.FAILED);
@@ -151,9 +152,22 @@ public class PaymentOrchestratorService {
             return createFailedResponse(request.getIdempotencyKey(), "Provider rejected the payment");
         }
 
-        // In Session 2, we'll also store providerResponse.providerOrderId() on the intent.
-        // For now with the mock provider, we simply proceed.
+        intent.setProviderOrderId(providerResponse.providerOrderId());
 
+        if (providerResponse.requiresWebhookConfirmation()) {
+            // Razorpay path: wait for the webhook before settling.
+            intent.setStatus(PaymentStatus.AWAITING_PROVIDER);
+            paymentIntentRepository.save(intent);
+            PaymentResponse response = PaymentResponse.builder()
+                    .paymentId(intent.getId())
+                    .status(PaymentStatus.AWAITING_PROVIDER)
+                    .message("Payment initiated with provider; awaiting confirmation")
+                    .build();
+            idempotencyService.save(request.getIdempotencyKey(), response);
+            return response;
+        }
+
+// Mock path: settlement is synchronous.
         intent.setStatus(PaymentStatus.PENDING);
         paymentIntentRepository.save(intent);
 
@@ -166,6 +180,7 @@ public class PaymentOrchestratorService {
                 .build();
         idempotencyService.save(request.getIdempotencyKey(), response);
         return response;
+
     }
 
     private RiskAssessment assessRisk(CreatePaymentRequest request) {

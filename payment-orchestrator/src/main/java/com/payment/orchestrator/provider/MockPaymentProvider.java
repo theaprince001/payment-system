@@ -16,7 +16,7 @@ public class MockPaymentProvider implements PaymentProvider {
     public ProviderResponse initiatePayment(PaymentIntent intent) {
         String mockOrderId = "mock_order_" + UUID.randomUUID();
         log.info("Mock provider created order {} for intent {}", mockOrderId, intent.getId());
-        return new ProviderResponse(mockOrderId, true);
+        return new ProviderResponse(mockOrderId, true, false);   // no webhook needed
     }
 
     @Override

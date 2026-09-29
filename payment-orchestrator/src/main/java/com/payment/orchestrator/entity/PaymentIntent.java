@@ -49,11 +49,13 @@ public class PaymentIntent {
 
     private String riskDecision;     // ALLOW, REVIEW, BLOCK
     private String riskSource;       // ML, FALLBACK, RULE, ERROR
-    private double riskScore;
+    private Double riskScore;
 
     private String reviewedBy;
     private Instant reviewedAt;
     private String reviewNote;
+
+    private String providerOrderId;
 
     @PrePersist
     protected void onCreate() {
