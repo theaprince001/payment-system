@@ -16,6 +16,17 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+
+/**
+ * Uses direct HTTP calls to Razorpay's REST API rather than the razorpay-java SDK.
+ *
+ * Reason: the SDK produced "BAD_REQUEST_ERROR:Authentication failed" even though the same
+ * credentials worked when passed to the REST endpoint directly via curl. Rather than debug
+ * SDK internals, we call the API ourselves with Spring's RestTemplate and Basic auth.
+ * This is also what our design notes recommended — fewer moving parts, better debuggability.
+ */
+
+
 @Component
 @ConditionalOnProperty(name = "payment.provider", havingValue = "razorpay")
 @Slf4j
