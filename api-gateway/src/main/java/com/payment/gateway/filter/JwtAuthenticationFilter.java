@@ -1,4 +1,3 @@
-
 package com.payment.gateway.filter;
 
 import io.jsonwebtoken.Claims;
@@ -30,7 +29,16 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
-        if (path.startsWith("/api/auth/") || path.startsWith("/actuator") || path.startsWith("/swagger-ui")) {
+
+        // Paths that intentionally bypass JWT auth at the gateway:
+        // - /api/auth/**        : login / register — no token yet
+        // - /api/webhooks/**    : provider callbacks — Razorpay does not send a JWT;
+        //                         the endpoint verifies HMAC signatures itself
+        // - /actuator, /swagger: operational endpoints
+        if (path.startsWith("/api/auth/")
+                || path.startsWith("/api/webhooks/")
+                || path.startsWith("/actuator")
+                || path.startsWith("/swagger-ui")) {
             return chain.filter(exchange);
         }
 

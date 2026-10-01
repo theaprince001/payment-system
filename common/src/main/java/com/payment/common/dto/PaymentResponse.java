@@ -15,4 +15,5 @@ public class PaymentResponse {
     private UUID paymentId;
     private PaymentStatus status;
     private String message;
+    private String providerOrderId;   // ← new (null for non-Razorpay responses)
 }

@@ -31,6 +31,10 @@ spring:
           uri: ${PAYMENT_ORCHESTRATOR_URL:http://localhost:8084}
           predicates:
             - Path=/api/payments/**
+        - id: payment-orchestrator-webhooks
+          uri: ${PAYMENT_ORCHESTRATOR_URL:http://localhost:8084}
+          predicates:
+            - Path=/api/webhooks/**
         - id: ledger-service
           uri: ${LEDGER_SERVICE_URL:http://localhost:8085}
           predicates:

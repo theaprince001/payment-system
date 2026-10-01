@@ -17,6 +17,7 @@ import java.util.UUID;
 @Repository
 public interface PaymentIntentRepository extends JpaRepository<PaymentIntent, UUID> {
     Optional<PaymentIntent> findByIdempotencyKey(String idempotencyKey);
+    Optional<PaymentIntent> findByProviderOrderId(String providerOrderId);
 
     @Query("SELECT p FROM PaymentIntent p WHERE p.status = :status AND p.createdAt < :cutoff")
     List<PaymentIntent> findByStatusAndCreatedAtBefore(@Param("status") PaymentStatus status,

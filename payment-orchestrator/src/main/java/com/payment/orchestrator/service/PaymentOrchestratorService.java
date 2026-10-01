@@ -155,13 +155,14 @@ public class PaymentOrchestratorService {
         intent.setProviderOrderId(providerResponse.providerOrderId());
 
         if (providerResponse.requiresWebhookConfirmation()) {
-            // Razorpay path: wait for the webhook before settling.
             intent.setStatus(PaymentStatus.AWAITING_PROVIDER);
+            intent.setProviderOrderId(providerResponse.providerOrderId());
             paymentIntentRepository.save(intent);
             PaymentResponse response = PaymentResponse.builder()
                     .paymentId(intent.getId())
                     .status(PaymentStatus.AWAITING_PROVIDER)
                     .message("Payment initiated with provider; awaiting confirmation")
+                    .providerOrderId(providerResponse.providerOrderId())   // ← new
                     .build();
             idempotencyService.save(request.getIdempotencyKey(), response);
             return response;
